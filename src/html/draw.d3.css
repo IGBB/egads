@@ -1,0 +1,190 @@
+* {
+    font-family: sans-serif;
+}
+body {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.content {
+    max-width: 800px;
+}
+
+
+
+.distro .line {
+    fill: none;
+    stroke-width: 1px;
+    stroke: black;
+}
+.distro .area {
+    fill: steelblue;
+    opacity: 0.50;
+}
+
+.distro text {
+     font-size: 10px;
+     font-family: sans-serif;
+     text-anchor: middle;
+}
+
+#size {
+    fill: steelblue;
+    opacity: 0.50;
+
+}
+
+.size_label{
+    text-anchor: middle;
+    font-size: 8px;
+    font-family: sans-serif;
+}
+
+#labelleft, #labelright{
+    text-anchor: middle;
+    font-size: 8px;
+    font-family: sans-serif;
+}
+
+
+table {
+    margin: 1em;
+    width: 100%;
+     border-collapse: collapse;
+  border-spacing: 0;
+}
+
+caption {
+    caption-side: bottom;
+    margin-top: 1em;
+}
+
+.caption {
+    text-align: center;
+}
+
+caption dl {
+    text-align: start;
+    font-size: 12px;
+}
+caption dt {
+    font-weight: bold;
+}
+caption dl dl dt{
+    float: left ;
+}
+caption dl dl dd{
+    margin-left: 7.5em;;
+}
+
+td {
+    padding: 5px;
+    text-align: end;
+}
+td, th {
+    font-size: 14px;
+}
+td:first-child{
+    text-align: start;
+}
+
+
+#controls{
+    display: flex;
+    justify-content: space-around;
+}
+
+/* from https://scotch.io/tutorials/google-material-design-input-boxes-in-css3 */
+/* form starting stylings ------------------------------- */
+.group        {
+  position:relative;
+  margin-top:2em;
+}
+input         {
+  font-size:18px;
+  padding: 5px;
+  display:block;
+  width:150px;
+  border:none;
+  border-bottom:1px solid #757575;
+}
+input:focus     { outline:none; }
+
+/* LABEL ======================================= */
+label          {
+  color:#999;
+  font-size:18px;
+  font-weight:normal;
+  position:absolute;
+  pointer-events:none;
+  left:5px;
+  top:10px;
+  transition:0.2s ease all;
+  -moz-transition:0.2s ease all;
+  -webkit-transition:0.2s ease all;
+}
+
+/* active state */
+input:focus ~ label, input:valid ~ label    {
+  top:-10px;
+  font-size:14px;
+  color:#5264AE;
+}
+
+/* BOTTOM BARS ================================= */
+.bar  { position:relative; display:block; width:300px; }
+.bar:before, .bar:after   {
+  content:'';
+  height:2px;
+  width:0;
+  bottom:1px;
+  position:absolute;
+  background:#5264AE;
+  transition:0.2s ease all;
+  -moz-transition:0.2s ease all;
+  -webkit-transition:0.2s ease all;
+}
+.bar:before {
+  left:50%;
+}
+.bar:after {
+  right:50%;
+}
+
+/* active state */
+input:focus ~ .bar:before, input:focus ~ .bar:after {
+  width:50%;
+}
+
+/* HIGHLIGHTER ================================== */
+.highlight {
+  position:absolute;
+  height:60%;
+  width:100px;
+  top:25%;
+  left:0;
+  pointer-events:none;
+  opacity:0.5;
+}
+
+/* active state */
+input:focus ~ .highlight {
+  -webkit-animation:inputHighlighter 0.3s ease;
+  -moz-animation:inputHighlighter 0.3s ease;
+  animation:inputHighlighter 0.3s ease;
+}
+
+/* ANIMATIONS ================ */
+@-webkit-keyframes inputHighlighter {
+  from { background:#5264AE; }
+  to  { width:0; background:transparent; }
+}
+@-moz-keyframes inputHighlighter {
+  from { background:#5264AE; }
+  to  { width:0; background:transparent; }
+}
+@keyframes inputHighlighter {
+  from { background:#5264AE; }
+  to  { width:0; background:transparent; }
+}

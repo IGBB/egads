@@ -1,0 +1,110 @@
+    <body>
+
+        <div  class="content" id="table">
+            <div id="controls">
+                <div class='group'>
+                    <input type="text" id="methyl" value="15"/>
+                    <label for="methyl">% Methylation</label>
+                </div>
+                <div class='group'>
+                    <input type="text" id="missing" value="0"/>
+                    <label for="missing">% Missing</label>
+                </div>
+                <div class='group'>
+                    <input type="text" id="depth" value="10"/>
+                    <label for="depth">Coverage Depth</label>
+                </div>
+                <div class='group'>
+                    <input type="text" id="lane" value="350"/>
+                    <label for="depth">Reads per Lane (M)</label>
+                </div>
+            </div>
+
+            <table>
+                <caption>Table of Enzyme Pairs sorted by the number of selected
+                    fragments in the distribution plot.
+
+                    <dl>
+                        <dt>Enzyme Pair</dt>
+                        <dd></dd>
+                        <dt>Fragments</dt>
+                        <dd>
+                            <dl>
+                                <dt>Total</dt>
+                                <dd>the total number of fragments between the enzyme
+                                    pairs.</dd>
+                                <dt>Selected</dt>
+                                <dd>number of fragments between enzyme pairs and size
+                                    selection.</dd>
+                            </dl>
+                        </dd>
+                        <dt>Fragment loss</dt>
+                        <dd>
+                            <dl>
+                                <dt>Methyl</dt>
+                                <dd>Number of fragments expected to be lost
+                                    due to methylation at a cutting site</dd>
+                                <dt>Mut</dt>
+                                <dd>Amount of fragment loss expected base on
+                                random mutation.
+                                https://doi.org/10.1016/j.tig.2010.05.003 </dd>
+                                <dt>Mis</dt>
+                                <dd>Number of missing fragments allowed. (base
+                                    on input above)</dd>
+                            </dl>
+                        </dd>
+                        <dt>Reads per Sample</dt>
+                        <dd>Number of reads needs to meet required coverage depth</dd>
+                        <dt>Samples per Lane</dt>
+                        <dd>Estimated number of samples that can fit on a lane
+                            given the expected reads per lane.</dd>
+                        <dt>Reduction Rate</dt>
+                        <dd>Percentage of the genome remaining after digestion and size selection</dd>
+                    </dl>
+                </caption>
+                <thead>
+                    <tr>
+                    <th rowspan="2">Enzyme Pair</th>
+                        <th colspan="2">Fragments</th>
+                        <th colspan="3">Fragment loss </th>
+                    <th rowspan="2" scope="depth">Reads per Sample</th>
+                    <th rowspan="2" scope="depth">Samples per Lane</th>
+                    <th rowspan="2" scope="depth">Reduction Rate</th>
+                    </tr>
+                    <tr>
+                    <th>Total</th>
+                    <th>Selected</th>
+                    <th>Methyl</th>
+                    <th>Mut</th>
+                    <th>Mis</th>
+                </tr></thead>
+            </table>
+        </div>
+        <div class="content">
+            <svg width="100%" preserveAspectRatio="xMinYMin" id="ridge"></svg>
+            <p class="caption">
+                Length distribution ridge plot of fragments between the enzyme pairs. Size
+                selection in grey. Sorted by number of fragments in selection area.
+            </p>
+        </div>
+        <div  class="content">
+            <svg width="100%" preserveAspectRatio="xMinYMin" id="gel"></svg>
+            <p class="caption">
+                Expected gel image of double-digestion products.
+            </p>
+        </div>
+
+        
+
+    </body>
+
+    <script type="text/javascript">
+     var data = JSON.parse(document.getElementById("data").innerHTML);
+     setup_ridge_plot(data, d3.select('#ridge'));
+     setup_gel_plot(data, d3.select('#gel'));
+     setup_table(data, d3.select('#table table'));
+
+     d3.selectAll('#controls input').on('change', table_update);
+
+    </script>
+

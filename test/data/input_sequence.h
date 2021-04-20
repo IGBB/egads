@@ -1,0 +1,47 @@
+#ifndef __INPUT_SEQUENCE_H_
+#define __INPUT_SEQUENCE_H_
+
+const char * input_sequence =
+    "ctaaattgtaagcgttaatattttgttaaaattcgcgttaaatttttgttaaatcagctcattttttaaccaata"
+    "ggccgaaatcggcaaaatcccttataaatcaaaagaatagaccgagatagggttgagtgttgttccagtttggaa"
+    "caagagtccactattaaagaacgtggactccaacgtcaaagggcgaaaaaccgtctatcagggcgatggcccact"
+    "acgtgaaccatcaccctaatcaagttttttggggtcgaggtgccgtaaagcactaaatcggaaccctaaagggag"
+    "cccccgatttagagcttgacggggaaagccggcgaacgtggcgagaaaggaagggaagaaagcgaaaggagcggg"
+    "cgctagggcgctggcaagtgtagcggtcacgctgcgcgtaaccaccacacccgccgcgcttaatgcgccgctaca"
+    "gggcgcgtcccattcgccattcaggctgcgcaactgttgggaagggcgatcggtgcgggcctcttcgctattacg"
+    "ccagctggcgaaagggggatgtgctgcaaggcgattaagttgggtaacgccagggttttcccagtcacgacgttg"
+    "taaaacgacggccagtgagcgcgcgtaatacgactcactatagggcgaattggagctccaccgcggtggcggccg"
+    "ctctagaactagtggatcccccgggctgcaggaattcgatatcaagcttatcgataccgtcgacctcgagggggg"
+    "gcccggtacccagcttttgttccctttagtgagggttaattgcgcgcttggcgtaatcatggtcatagctgtttc"
+    "ctgtgtgaaattgttatccgctcacaattccacacaacatacgagccggaagcataaagtgtaaagcctggggtg"
+    "cctaatgagtgagctaactcacattaattgcgttgcgctcactgcccgctttccagtcgggaaacctgtcgtgcc"
+    "agctgcattaatgaatcggccaacgcgcggggagaggcggtttgcgtattgggcgctcttccgcttcctcgctca"
+    "ctgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatacggttatcca"
+    "cagaatcaggggataacgcaggaaagaacatgtgagcaaaaggccagcaaaaggccaggaaccgtaaaaaggccg"
+    "cgttgctggcgtttttccataggctccgcccccctgacgagcatcacaaaaatcgacgctcaagtcagaggtggc"
+    "gaaacccgacaggactataaagataccaggcgtttccccctggaagctccctcgtgcgctctcctgttccgaccc"
+    "tgccgcttaccggatacctgtccgcctttctcccttcgggaagcgtggcgctttctcatagctcacgctgtaggt"
+    "atctcagttcggtgtaggtcgttcgctccaagctgggctgtgtgcacgaaccccccgttcagcccgaccgctgcg"
+    "ccttatccggtaactatcgtcttgagtccaacccggtaagacacgacttatcgccactggcagcagccactggta"
+    "acaggattagcagagcgaggtatgtaggcggtgctacagagttcttgaagtggtggcctaactacggctacacta"
+    "gaaggacagtatttggtatctgcgctctgctgaagccagttaccttcggaaaaagagttggtagctcttgatccg"
+    "gcaaacaaaccaccgctggtagcggtggtttttttgtttgcaagcagcagattacgcgcagaaaaaaaggatctc"
+    "aagaagatcctttgatcttttctacggggtctgacgctcagtggaacgaaaactcacgttaagggattttggtca"
+    "tgagattatcaaaaaggatcttcacctagatccttttaaattaaaaatgaagttttaaatcaatctaaagtatat"
+    "atgagtaaacttggtctgacagttaccaatgcttaatcagtgaggcacctatctcagcgatctgtctatttcgtt"
+    "catccatagttgcctgactccccgtcgtgtagataactacgatacgggagggcttaccatctggccccagtgctg"
+    "caatgataccgcgagacccacgctcaccggctccagatttatcagcaataaaccagccagccggaagggccgagc"
+    "gcagaagtggtcctgcaactttatccgcctccatccagtctattaattgttgccgggaagctagagtaagtagtt"
+    "cgccagttaatagtttgcgcaacgttgttgccattgctacaggcatcgtggtgtcacgctcgtcgtttggtatgg"
+    "cttcattcagctccggttcccaacgatcaaggcgagttacatgatcccccatgttgtgcaaaaaagcggttagct"
+    "ccttcggtcctccgatcgttgtcagaagtaagttggccgcagtgttatcactcatggttatggcagcactgcata"
+    "attctcttactgtcatgccatccgtaagatgcttttctgtgactggtgagtactcaaccaagtcattctgagaat"
+    "agtgtatgcggcgaccgagttgctcttgcccggcgtcaatacgggataataccgcgccacatagcagaactttaa"
+    "aagtgctcatcattggaaaacgttcttcggggcgaaaactctcaaggatcttaccgctgttgagatccagttcga"
+    "tgtaacccactcgtgcacccaactgatcttcagcatcttttactttcaccagcgtttctgggtgagcaaaaacag"
+    "gaaggcaaaatgccgcaaaaaagggaataagggcgacacggaaatgttgaatactcatactcttcctttttcaat"
+    "attattgaagcatttatcagggttattgtctcatgagcggatacatatttgaatgtatttagaaaaataaacaaa"
+    "taggggttccgcgcacatttccccgaaaagtgccac";
+
+
+#endif // __INPUT_SEQUENCE_H_
