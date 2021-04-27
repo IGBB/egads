@@ -6,7 +6,7 @@
 
 CC = gcc
 CFLAGS = -Wall -O3 -lm -ggdb
-PROG=../ddrad-viz
+PROG=../egads
 
 .PHONY: all clean
 
