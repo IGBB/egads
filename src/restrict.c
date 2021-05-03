@@ -28,7 +28,7 @@ void site_list_free(site_list_t* list){
 
 
 inline site_t* site_list_push(site_list_t* list){
-    enzyme_t * ret;
+    site_t * ret;
 
     if(list->n == list->m){
         list->m *= 2;

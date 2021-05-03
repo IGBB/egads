@@ -27,6 +27,38 @@ inline enzyme_t* enzyme_list_push(enzyme_list_t* list){
 
 }
 
+
+/* mimic strtok function; but don't skip empty delimeters */
+char* strtok2(char* string, char token){
+    /* setup locally scoped but persistant variable */
+    static char* copy;
+
+    /* set persistant varible if string is set (new string to tokenize)  */
+    if(string != NULL) copy = string;
+
+    /* if finished tokenizing string, return null */
+    if(copy == NULL) return NULL;
+
+    char* ret = copy;
+
+    /* find token in string */
+    char* tok = strchr(copy, token);
+
+    /* if token is found */
+    if(tok != NULL){
+        /* replace token with '\0' */
+        *tok = '\0';
+        /* set persistant variable to the remaining string*/
+        copy = tok + 1;
+    } else {
+        /*clear persistant variable*/
+        copy = NULL;
+    }
+
+    return ret;
+}
+
+
 enzyme_list_t* load_enzymes(FILE* input, char** names, int len){
     int i;
     char *s = NULL;
@@ -36,8 +68,8 @@ enzyme_list_t* load_enzymes(FILE* input, char** names, int len){
     /* if input isn't provided, open mem stream to saved restriction enzymes */
     FILE* file = input;
     if(file == NULL)
-        file = fmemopen(_binary_emboss_e_txt_start,
-                        _binary_emboss_e_txt_size,
+        file = fmemopen(_binary_msbuffmin_txt_start,
+                        _binary_msbuffmin_txt_size,
                         "r");
 
 
@@ -58,11 +90,11 @@ enzyme_list_t* load_enzymes(FILE* input, char** names, int len){
     /* read each line in enzyme database */
     while((rlen = getline(&s, &slen, file)) != -1 ){
 
-        /* skip comments */
-        if(s[0] == '#') continue;
+        /* skip lines that begin with space */
+        if(s[0] == ' ') continue;
 
-        /* get name (first tab column) */
-        char * name = strtok(s, "\t");
+        /* get name (first column) */
+        char * name = strtok2(s, ';');
 
         enzyme_t * e;
 
@@ -84,32 +116,78 @@ enzyme_list_t* load_enzymes(FILE* input, char** names, int len){
         }
 
 
-       strncpy(e->name, name, 32);
+        /* Safely copy name to the enzyme struct  */
+        strncpy(e->name, name, 32);
 
-       /* clear pattern and copy pattern string to array*/
-       memset(pattern , 0 , 16);
-       strncpy(pattern, strtok(NULL,"\t"), 16);
+        /* clear pattern and copy pattern string to array*/
+        memset(pattern , 0 , 16);
+        strncpy(pattern, strtok2(NULL,';'), 16);
+        e->length = strlen(pattern);
 
-       e->length = atoi(strtok(NULL,"\t"));
-       e->ncuts  = atoi(strtok(NULL,"\t"));
-       e->blunt  = atoi(strtok(NULL,"\t"));
+        /* Encode pattern   */
+        uint64_t base;
+        e->pattern = 0;  /* set pattern to 0, use ~or~ (|) to store each base */
+        for(i = 0; i < 16; i ++){
+            base = (uint64_t) pattern[i]; /* extract base from pattern */
+            base = seq_table[base] ;      /* encode base to 4bit flag */
+            base <<= ((15-i) * 4);        /* shift base to correct position - 1st
+                                           * base is the most significat 4 bits*/
+            e->pattern |= base;           /* store encoded base in pattern */
+        }
 
-       for(i = 0; i < 4; i++)
-           e->c[i]  = atoi(strtok(NULL,"\t"));
+        /* 5` and 3` cut site  */
+        e->c[0] = atoi(strtok2(NULL,';'));
+        e->c[1] = atoi(strtok2(NULL,';'));
 
-       /* Encode pattern   */
-       uint64_t base;
-       e->pattern = 0;  /* set pattern to 0, use ~or~ (|) to store each base */
-       for(i = 0; i < 16; i ++){
-           base = (uint64_t) pattern[i]; /* extract base from pattern */
-           base = seq_table[base] ;      /* encode base to 4bit flag */
-           base <<= ((15-i) * 4);        /* shift base to correct position - 1st
-                                          * base is the most significat 4 bits*/
-           e->pattern |= base;           /* store encoded base in pattern */
-       }
+        /* Enzyme is blunt if cut sites are equal */
+        e->blunt = (e->c[0] == e->c[1]);
+
+        /* Methylation data (discarded) */
+        strtok2(NULL,';');
+
+        /* Enzyme Type (discarded) */
+        strtok2(NULL,';');
+
+        /* Suppliers (discarded) */
+        strtok2(NULL,';');
+
+
+        /* Buffers (semicolon terminated, comma delimited list) NOTE: some of
+         * the buffer names contain semicolons, e.g "O:Toyobo NheI; RsaI; SfiI"
+         */
+
+        /* Safely copy the rest of the line to buffer_string */
+        strncpy(e->buffer_string, strtok2(NULL,'\n'), 300);
+        /* Ensure safe string */
+        e->buffer_string[299] = '\0';
+        /* Remove semicolon termination */
+        e->buffer_string[strlen(e->buffer_string) - 1 ] = '\0';
+
+        /* Tokenize buffer_string, sorting and storing locations in
+         * buffer_list */
+        char* key = strtok2(e->buffer_string, ',');
+        e->buffer_length = 0;
+
+        /* Loop until no more buffers found */
+        while(key != NULL){
+
+            /* find correct spot int buffer_list (insertion sort) */
+            for(i = e->buffer_length-1;
+                i >= 0 && strcmp(key, e->buffer_list[i]) == 1;
+                i--)
+                e->buffer_list[i+1] = e->buffer_list[i];
+
+            /* insert key, and increment length */
+            e->buffer_list[i+1] = key;
+            e->buffer_length += 1;
+
+            /* read next buffer */
+            key = strtok2(NULL, ',');
+        }
 
     }
 
+    free(s);
 
     /* if file is mem buffer, close file */
     if(input == NULL) fclose(file);

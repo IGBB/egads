@@ -30,20 +30,20 @@ int parse_enzymes(char * string, char * list []){
 }
 
 enzyme_list_t * get_enzymes(char * file, char ** names, int len){
-    FILE* emboss_e = NULL;
+    FILE* msbuffmin = NULL;
 
     if(file != NULL){
-        emboss_e = fopen(file, "r");
+        msbuffmin = fopen(file, "r");
 
-        if(emboss_e == NULL){
-            perror("Can't open emboss_e.txt file");
+        if(msbuffmin == NULL){
+            perror("Can't open msbuffmin.txt file");
             exit(1);
         }
     }
-    enzyme_list_t * enzymes = load_enzymes(emboss_e, names, len);
+    enzyme_list_t * enzymes = load_enzymes(msbuffmin, names, len);
 
     if(file != NULL)
-        fclose(emboss_e);
+        fclose(msbuffmin);
 
     return enzymes;
 }
