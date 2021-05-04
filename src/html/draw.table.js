@@ -38,7 +38,13 @@ var table_update = function () {
                               .slice(ridge_plot.extent[0],
                                      ridge_plot.extent[1] + 1))/ row.genome_size
 
-        return [row.name, // enzyme pair
+        var compat = ""
+        if(row.compat == 0) compat = " &#9940;"
+        if(row.compat == 1) compat = " &#9989;"
+        if(row.compat == 2) compat = " &#10067;"
+
+        return [compat, // enzyme compatability
+                row.name, // enzyme pair
                 d3.sum(row.good), // total number of good fragments
                 total_selected, // total number of good fragments inside selected size
                 methyl_frag, // methylation reduction

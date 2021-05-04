@@ -16,7 +16,8 @@ extern const char _binary_msbuffmin_txt_end[];
 typedef struct {
     char name [32],        /* Name of Enzyme */
         *buffer_list[20],  /* Sorted list of buffer names */
-        buffer_string[300];/* \0 delimeted list of buffers */
+        buffer_string[300],/* \0 delimited list of buffers */
+        supplier[20];      /* supplier list */
 
     uint64_t pattern;      /* Encodded Recognition site, able to hold 16 bases,
                             * needs to be right padded with 0*/
@@ -43,5 +44,21 @@ typedef struct {
  *   Load enzymes from msbuffmin.txt file.
  ******************************************************************************/
 enzyme_list_t* load_enzymes(FILE*, char**, int );
+
+/*******************************************************************************
+ * enzyme_is_compat
+ *
+ *   1. enzyme_t*         :: enzyme 1
+ *   2. enzyme_t*         :: enzyme 2
+ *   r. int               :: boolean
+ *
+ *   return 1 if the same string in the buffer list is found, else 0. A special
+ *   case was added to return 2 if both enzymes are supplied by NEB but don't
+ *   have the same buffer name.
+ *
+ ******************************************************************************/
+
+int enzyme_is_compat(enzyme_t*, enzyme_t*);
+
 
 #endif // __ENZYME_H_

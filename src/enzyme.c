@@ -148,8 +148,8 @@ enzyme_list_t* load_enzymes(FILE* input, char** names, int len){
         /* Enzyme Type (discarded) */
         strtok2(NULL,';');
 
-        /* Suppliers (discarded) */
-        strtok2(NULL,';');
+        /* Suppliers */
+        strncpy(e->supplier, strtok2(NULL,';'), 20);
 
 
         /* Buffers (semicolon terminated, comma delimited list) NOTE: some of
@@ -194,3 +194,34 @@ enzyme_list_t* load_enzymes(FILE* input, char** names, int len){
 
     return list;
 };
+
+
+/* rudementary buffer compatibility check. Doesn't work well since the only
+ * buffer data from REBASE is incomplete.  */
+int enzyme_is_compat(enzyme_t* a, enzyme_t* b){
+    int i = 0, j = 0;
+
+    /* loop until end of a or b buffer list is reached  */
+    while(i < a->buffer_length && j < b->buffer_length){
+
+        /* compare current buffer names */
+        int compare = strcmp(a->buffer_list[i], b->buffer_list[j]);
+
+        /* if the two buffers are the same, return true. Else, increment the
+         * index of the smaller value ( works since the lists are sorted ) */
+        if(compare == 0 ) return 1;
+        else if ( compare < 0 ) i++;
+        else if ( compare > 0 ) j++;
+    }
+
+    /* Since NEB is moving many of their enzymes to the smartcut buffer but not
+     * updating the msbufmin file, a special case is added to return "maybe" if
+     * both enzymes are supplied by NEB */
+    if(strchr(a->supplier, 'N') != NULL &&
+       strchr(b->supplier, 'N') != NULL){
+        return 2;
+    }
+
+
+    return 0;
+}

@@ -14,7 +14,7 @@
 KSEQ_INIT(gzFile, gzread);
 
 
-extern void print_html (FILE*, char*, enzyme_list_t*, counts_t*, size_t, size_t, long, int);
+extern void print_html (FILE*, char*, counts_t*, size_t, long, int);
 
 
 int parse_enzymes(char * string, char * list []){
@@ -83,7 +83,12 @@ int main(int argc, char **argv) {
     site_t ** matrix =  malloc( (rare_length * freq_length) * sizeof(site_t*) );
     counts_t * counts =  malloc( (rare_length * freq_length) * sizeof(counts_t) );
 
+    /* set counts struct for each rare/freq combination */
     memset(counts, 0, (rare_length * freq_length) * sizeof(counts_t));
+    for(i = 0; i < rare_length * freq_length; i++){
+        counts[i].rare = &(enzymes->d[i/freq_length]);
+        counts[i].freq = &(enzymes->d[rare_length + i%freq_length]);
+    }
 
     site_list_t * sites = site_list_init();
 
@@ -187,10 +192,8 @@ int main(int argc, char **argv) {
 
     print_html(stdout,
                argv[3],
-               enzymes,
                counts,
-               rare_length,
-               freq_length,
+               rare_length * freq_length,
                genome_size,
                mutation_frags);
 
