@@ -17,18 +17,21 @@ function setup_ridge_plot(data, container) {
                               .attr("transform", `translate(${ridge_plot.margin.left} ${ridge_plot.margin.top})`)
 
 
+    ridge_height = d3.max(data.map((d)=>d3.deviation(d.good.slice(1,-1))*4 +
+                                  d3.mean(d.good.slice(1,-1))))
+
     // Setup scales for plot
     ridge_plot.scale = {}
     ridge_plot.scale.band = d3.scaleBand()
                               .range([0, ridge_plot.height])
                               .domain(data.map(d => d.name))
-                              .padding(0.4);
+                              .paddingInner(0.2)
     ridge_plot.scale.x = d3.scaleLinear()
                            .domain([0, data[0].good.length-2])
                            .range([0, ridge_plot.width])
                            .nice()
     ridge_plot.scale.y = d3.scaleLinear()
-                           .domain([0, d3.max(data.map((d)=>d3.mean(d.good)*2))])
+                           .domain([0, ridge_height])
                            .range([ridge_plot.scale.band.bandwidth(),0])
 
 
