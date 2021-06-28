@@ -79,14 +79,6 @@ enzyme_list_t* load_enzymes(FILE* input, char** names, int len){
 
     enzyme_list_t * list = enzyme_list_init();
 
-    /* if names are given, adjust the size of the enzyme list to match the
-     * length of the given names; so we can add the enzymes in the correct
-     * order */
-    if(len){
-        list->n = len-1;
-        enzyme_list_push(list);
-    }
-
     /* read each line in enzyme database */
     while((rlen = getline(&s, &slen, file)) != -1 ){
 
@@ -106,15 +98,10 @@ enzyme_list_t* load_enzymes(FILE* input, char** names, int len){
                 i++);
             /* if i == len then no match found; skip entry */
             if(i == len) continue;
-
-            /* set entry point to correct location */
-            e = &(list->d[i]);
-
-        /* else enzyme is added to end of list */
-        }else {
-            e = enzyme_list_push(list);
         }
 
+        /* Add space for new enzyme */
+        e = enzyme_list_push(list);
 
         /* Safely copy name to the enzyme struct  */
         strncpy(e->name, name, 32);

@@ -48,6 +48,21 @@ enzyme_list_t * get_enzymes(char * file, char ** names, int len){
     return enzymes;
 }
 
+/* return triangle matrix size including diagonal */
+#define triangle_size(n) ((n) * ((n) + 1) / 2)
+/* return the upper triangle index */
+inline size_t get_idx(size_t n, size_t a, size_t b){
+    size_t i,j;
+    if( a < b ){
+        i = a;
+        j = b;
+    }else{
+        i = b;
+        j = a;
+    }
+
+    return (n * i) + j - ((i * (i+1)) / 2);
+}
 
 int main(int argc, char **argv) {
     size_t i,j;
@@ -73,21 +88,19 @@ int main(int argc, char **argv) {
                                           names,
                                           rare_length + freq_length);
 
-    for(i =0; i < enzymes->n; i++){
-        fprintf(stderr, "%s, ", enzymes->d[i].name);
-    }
-    fprintf(stderr, "\n");
 
+    // Create triangle matrix to store last site seen for each enzyme pair
+    site_t ** matrix = malloc(triangle_size(enzymes->n) * sizeof(counts_t) );
 
-
-    site_t ** matrix =  malloc( (rare_length * freq_length) * sizeof(site_t*) );
-    counts_t * counts =  malloc( (rare_length * freq_length) * sizeof(counts_t) );
-
-    /* set counts struct for each rare/freq combination */
-    memset(counts, 0, (rare_length * freq_length) * sizeof(counts_t));
-    for(i = 0; i < rare_length * freq_length; i++){
-        counts[i].rare = &(enzymes->d[i/freq_length]);
-        counts[i].freq = &(enzymes->d[rare_length + i%freq_length]);
+    // Create triangle matrix to store counts of each enzyme pair, setting all to 0
+    counts_t * counts =  malloc(triangle_size(enzymes->n) * sizeof(counts_t) );
+    memset(counts, 0, triangle_size(enzymes->n) * sizeof(counts_t) );
+    for(i = 0; i < enzymes->n; i++){
+        for(j = i; j< enzymes->n; j++){
+            int idx = get_idx(enzymes->n, i, j);
+            counts[idx].rare = &(enzymes->d[i]);
+            counts[idx].freq = &(enzymes->d[j]);
+       }
     }
 
     site_list_t * sites = site_list_init();
@@ -115,69 +128,49 @@ int main(int argc, char **argv) {
 
         /* clear matrix for new sequence */
         site_t tmp = {.enz=-1, .pos=0};
-        for(i = 0; i < rare_length * freq_length; i++){
+        for(i = 0; i < triangle_size(enzymes->n); i++)
             matrix[i] = &tmp;
-        }
-
 
         /* loop through the sites, collating them to rare-freq pairs  */
         for(i = 0; i < sites->n; i++){
             site_t* cur = &(sites->d[i]);
 
-            size_t start, end, stride;
-            /* TODO: Since we expect freq cutter to be seen more than the rare,
-             * it may be benificial to make rare cutters columns and freq cutter
-             * rows*/
-            /* rare cutter (row access)*/
-            if(cur->enz < rare_length){
-                start  = cur->enz * freq_length;
-                end    = start + freq_length;
-                stride = 1;
-            /* freq cutter (column access)*/
-            } else {
-                start  = cur->enz - rare_length;
-                end    = rare_length*freq_length;
-                stride = freq_length;
-            }
-
-
             /* compare new and old sites */
-            for(j = start; j < end ; j+=stride){
+            for(j = 0; j < enzymes->n; j++){
+                int idx = get_idx(enzymes->n, cur->enz, j);
 
                 /* get length of current fragment, adjust if longer than 10kb */
-                int len = cur->pos - matrix[j]->pos;
+                int len = cur->pos - matrix[idx]->pos;
                 len = (len > ALL_SIZE)? ALL_SIZE+1 : len;
 
-
-
-                counts[j].all[len]++;
+                counts[idx].all[len]++;
 
                 /* adjust length again if longer than 1kb */
                 len = (len > GOOD_SIZE)? GOOD_SIZE+1 : len;
-                /* store fragment if between different  */
-                if( matrix[j]->enz != cur->enz &&
-                                matrix[j]->enz != -1 )
-                    counts[j].good[len]++;
+
+                /* store fragment if between different enzymes, or if current
+                 * pair is single enzyme digestion */
+                if((matrix[idx]->enz != -1        &&
+                    matrix[idx]->enz != cur->enz) ||
+                    j == cur->enz)
+                    counts[idx].good[len]++;
 
                 /* replace previous site */
-                matrix[j]=cur;
+                matrix[idx]=cur;
             }
-
-
         }
 
         /* final fragments */
-        for(i = 0; i < rare_length * freq_length; i++){
-
+        for(i = 0; i < enzymes->n; i++){
+            for(j = 0; j < enzymes->n; j++){
+                int idx = get_idx(enzymes->n,i,j);
             /* get length of last fragment, adjust if longer than 10kb */
-                int len =  seq->seq.l - matrix[i]->pos;
+                int len =  seq->seq.l - matrix[idx]->pos;
                 len = (len > ALL_SIZE)? ALL_SIZE+1 : len;
 
-                counts[i].all[len]++;
-
+                counts[idx].all[len]++;
+            }
         }
-
-
 
         /* clear the sites vector  */
         site_list_clear(sites);
@@ -190,10 +183,50 @@ int main(int argc, char **argv) {
     site_list_free(sites);
     sites = NULL;
 
+    // free data structures no longer needed
+    free(matrix);
+
+    size_t count_size = 0;
+    for(i = 0; i < triangle_size(enzymes->n); i++){
+        int rare = 0, freq = 0;
+        // Check rare list for the two enzymes
+        for(j = 0; j < rare_length; j++){
+            if(strcmp(counts[i].rare->name, names[j]) == 0)
+                rare |= 1;
+            if(strcmp(counts[i].freq->name, names[j]) == 0)
+                freq |= 1;
+        }
+
+        // Check freq list for the two enzymes
+        for(j = rare_length; j < rare_length+freq_length; j++){
+            if(strcmp(counts[i].rare->name, names[j]) == 0)
+                rare |= 2;
+            if(strcmp(counts[i].freq->name, names[j]) == 0)
+                freq |= 2;
+        }
+
+        /* skip unless both enzymes in the ueser given list */
+        if(freq == 0 || rare == 0 || (freq | rare) != 3 ) continue;
+
+
+        /* swap enzymes if rare is in freq list or vise-versa */
+        if(rare == 2 || freq == 1){
+            enzyme_t* swp = counts[i].rare;
+            counts[i].rare = counts[i].freq;
+            counts[i].freq = swp;
+        }
+
+        /* move current counts to next available space */
+        counts[count_size] = counts[i];
+        count_size++;
+
+    }
+
+
     print_html(stdout,
                argv[3],
                counts,
-               rare_length * freq_length,
+               count_size,
                genome_size,
                mutation_frags);
 
