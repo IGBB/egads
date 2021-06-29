@@ -59,19 +59,27 @@ char* strtok2(char* string, char token){
 }
 
 
-enzyme_list_t* load_enzymes(FILE* input, char** names, int len){
+enzyme_list_t* load_enzymes(char* input, char** names, int len){
     int i;
     char *s = NULL;
     size_t slen = 0;
     ssize_t rlen;
 
-    /* if input isn't provided, open mem stream to saved restriction enzymes */
-    FILE* file = input;
-    if(file == NULL)
-        file = fmemopen(_binary_msbuffmin_txt_start,
+    /* Open enzyme file. If file isn't provided, open mem stream to saved
+     * restriction enzymes */
+    FILE* file;
+    if(input != NULL){
+        file = fopen(input, "r");
+        /* die if file can't be opened */
+        if( file == NULL ){
+            perror("Can't open enzyme file");
+            exit(1);
+        }
+    }else{
+        file = fmemopen((void *)_binary_msbuffmin_txt_start,
                         _binary_msbuffmin_txt_size,
                         "r");
-
+    }
 
     /* pattern string to be encoded. NOTE: Must be equal to the number of bases
      * the enzyme_t pattern element can hold */
@@ -176,8 +184,7 @@ enzyme_list_t* load_enzymes(FILE* input, char** names, int len){
 
     free(s);
 
-    /* if file is mem buffer, close file */
-    if(input == NULL) fclose(file);
+    fclose(file);
 
     return list;
 };

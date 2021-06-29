@@ -29,25 +29,6 @@ int parse_enzymes(char * string, char * list []){
     return len;
 }
 
-enzyme_list_t * get_enzymes(char * file, char ** names, int len){
-    FILE* msbuffmin = NULL;
-
-    if(file != NULL){
-        msbuffmin = fopen(file, "r");
-
-        if(msbuffmin == NULL){
-            perror("Can't open msbuffmin.txt file");
-            exit(1);
-        }
-    }
-    enzyme_list_t * enzymes = load_enzymes(msbuffmin, names, len);
-
-    if(file != NULL)
-        fclose(msbuffmin);
-
-    return enzymes;
-}
-
 int main(int argc, char **argv) {
     size_t i,j;
     char * enzyme_file = NULL;
@@ -68,7 +49,7 @@ int main(int argc, char **argv) {
     size_t freq_length = parse_enzymes(argv[2], &(names[rare_length]));
 
     /* get enzyme definitions from file */
-    enzyme_list_t * enzymes = get_enzymes(enzyme_file,
+    enzyme_list_t * enzymes = load_enzymes(enzyme_file,
                                           names,
                                           rare_length + freq_length);
 

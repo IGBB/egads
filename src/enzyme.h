@@ -35,7 +35,7 @@ typedef struct {
 /*******************************************************************************
  * load_enzymes
  *
- *   1. FILE*          :: enzyme file, NULL cause the file to be read from object
+ *   1. char*          :: enzyme file, NULL cause the file to be read from object
  *                           cached at compile time
  *   2. char**         :: list of enzyme names to load
  *   3. int            :: number of name in list, 0 if all are loaded
@@ -43,7 +43,7 @@ typedef struct {
  *
  *   Load enzymes from msbuffmin.txt file.
  ******************************************************************************/
-enzyme_list_t* load_enzymes(FILE*, char**, int );
+enzyme_list_t* load_enzymes(char*, char**, int );
 
 /*******************************************************************************
  * enzyme_is_compat
