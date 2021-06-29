@@ -44,7 +44,6 @@ extern const char _binary_html_draw_html_end[];
 void print_html (FILE* out,
                  char* name,
                  counts_t* counts,
-                 size_t length,
                  long genome_size,
                  int mutation_frags){
 
@@ -90,22 +89,22 @@ void print_html (FILE* out,
     /* json output */
     fprintf(out, "<script type=\"application/json\" id=\"data\">\n");
     fprintf(out, "[");
-    for(i = 0; i < length; i++){
+    for(i = 0; i < counts->m; i++){
         if(i > 0) fprintf(out, ",");
 
         fprintf(out, "{");
 
         fprintf(out, "\"name\": \"%s - %s\",",
-               counts[i].rare->name,
-               counts[i].freq->name);
+               counts->d[i].rare->name,
+               counts->d[i].freq->name);
 
         /* warn if either enzymes are blunt-ended */
         fprintf(out, "\"blunt\": %d,",
-                counts[i].rare->blunt | counts[i].freq->blunt);
+                counts->d[i].rare->blunt | counts->d[i].freq->blunt);
 
         /* warn if enzyme pairs don't have same buffer */
         fprintf(out, "\"compat\": %d,",
-                enzyme_is_compat(counts[i].rare, counts[i].freq));
+                enzyme_is_compat(counts->d[i].rare, counts->d[i].freq));
 
 
         fprintf(out, "\"genome_size\": %ld,", genome_size);
@@ -114,14 +113,14 @@ void print_html (FILE* out,
         fprintf(out, "\"all\": [");
         for(j = 0; j < ALL_SIZE+2; j++){
             if(j > 0) fprintf(out, ",");
-            fprintf(out, "%d", counts[i].all[j]);
+            fprintf(out, "%d", counts->d[i].all[j]);
         }
         fprintf(out, "],");
 
         fprintf(out, "\"good\": [");
         for(j = 0; j < GOOD_SIZE+2; j++){
             if(j > 0) fprintf(out, ",");
-            fprintf(out, "%d", counts[i].good[j]);
+            fprintf(out, "%d", counts->d[i].good[j]);
         }
 
         fprintf(out, "]");

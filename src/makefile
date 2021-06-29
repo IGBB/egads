@@ -5,7 +5,7 @@
 # @version 0.1
 
 CC = gcc
-CFLAGS = -Wall -O3 -lm -ggdb
+CFLAGS = -Wall -O3  -lm -ggdb
 PROG=../egads
 
 .PHONY: all clean
@@ -40,7 +40,7 @@ restrict.o : enzyme.o sequence.o
 main.o : restrict.o enzyme.o sequence.o html.o
 
 
-$(PROG): main.o restrict.o enzyme.o sequence.o html.o d3.bin.o css.bin.o \
+$(PROG): main.o restrict.o enzyme.o sequence.o counts.o html.o d3.bin.o css.bin.o \
 			html.bin.o gel.bin.o ridge.bin.o table.bin.o msbuffmin.bin.o
 	$(CC) -o $@ $(CFLAGS) -lz $^
 # end

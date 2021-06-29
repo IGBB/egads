@@ -14,7 +14,7 @@
 KSEQ_INIT(gzFile, gzread);
 
 
-extern void print_html (FILE*, char*, counts_t*, size_t, long, int);
+extern void print_html (FILE*, char*, counts_t*, long, int);
 
 
 int parse_enzymes(char * string, char * list []){
@@ -48,22 +48,6 @@ enzyme_list_t * get_enzymes(char * file, char ** names, int len){
     return enzymes;
 }
 
-/* return triangle matrix size including diagonal */
-#define triangle_size(n) ((n) * ((n) + 1) / 2)
-/* return the upper triangle index */
-inline size_t get_idx(size_t n, size_t a, size_t b){
-    size_t i,j;
-    if( a < b ){
-        i = a;
-        j = b;
-    }else{
-        i = b;
-        j = a;
-    }
-
-    return (n * i) + j - ((i * (i+1)) / 2);
-}
-
 int main(int argc, char **argv) {
     size_t i,j;
     char * enzyme_file = NULL;
@@ -89,20 +73,7 @@ int main(int argc, char **argv) {
                                           rare_length + freq_length);
 
 
-    // Create triangle matrix to store last site seen for each enzyme pair
-    site_t ** matrix = malloc(triangle_size(enzymes->n) * sizeof(counts_t) );
-
-    // Create triangle matrix to store counts of each enzyme pair, setting all to 0
-    counts_t * counts =  malloc(triangle_size(enzymes->n) * sizeof(counts_t) );
-    memset(counts, 0, triangle_size(enzymes->n) * sizeof(counts_t) );
-    for(i = 0; i < enzymes->n; i++){
-        for(j = i; j< enzymes->n; j++){
-            int idx = get_idx(enzymes->n, i, j);
-            counts[idx].rare = &(enzymes->d[i]);
-            counts[idx].freq = &(enzymes->d[j]);
-       }
-    }
-
+    counts_t * counts = counts_init(enzymes);
     site_list_t * sites = site_list_init();
 
     long genome_size = 0;
@@ -126,10 +97,8 @@ int main(int argc, char **argv) {
         /* find all sites that are cut by the given enzymes */
         sites = restrict_scan(enzymes, seq->seq.s, seq->seq.l, sites);
 
-        /* clear matrix for new sequence */
-        site_t tmp = {.enz=-1, .pos=0};
-        for(i = 0; i < triangle_size(enzymes->n); i++)
-            matrix[i] = &tmp;
+        /* clear last sites for new sequence */
+        counts_site_reset(counts);
 
         /* loop through the sites, collating them to rare-freq pairs  */
         for(i = 0; i < sites->n; i++){
@@ -137,39 +106,36 @@ int main(int argc, char **argv) {
 
             /* compare new and old sites */
             for(j = 0; j < enzymes->n; j++){
-                int idx = get_idx(enzymes->n, cur->enz, j);
+                count_t * c = counts_get(counts, cur->enz, j);
 
                 /* get length of current fragment, adjust if longer than 10kb */
-                int len = cur->pos - matrix[idx]->pos;
-                len = (len > ALL_SIZE)? ALL_SIZE+1 : len;
+                int len = cur->pos - c->last->pos;
+                if (len > ALL_SIZE) len = ALL_SIZE+1;
 
-                counts[idx].all[len]++;
+                c->all[len]++;
 
                 /* adjust length again if longer than 1kb */
-                len = (len > GOOD_SIZE)? GOOD_SIZE+1 : len;
+                if (len > GOOD_SIZE) len = GOOD_SIZE+1;
 
                 /* store fragment if between different enzymes, or if current
                  * pair is single enzyme digestion */
-                if((matrix[idx]->enz != -1        &&
-                    matrix[idx]->enz != cur->enz) ||
-                    j == cur->enz)
-                    counts[idx].good[len]++;
+                if((c->last->enz != -1        &&
+                    c->last->enz != cur->enz) ||
+                    (ssize_t)j == cur->enz)
+                    c->good[len]++;
 
                 /* replace previous site */
-                matrix[idx]=cur;
+                c->last=cur;
             }
         }
 
         /* final fragments */
-        for(i = 0; i < enzymes->n; i++){
-            for(j = 0; j < enzymes->n; j++){
-                int idx = get_idx(enzymes->n,i,j);
+        for(i = 0; i < counts->m; i++){
             /* get length of last fragment, adjust if longer than 10kb */
-                int len =  seq->seq.l - matrix[idx]->pos;
-                len = (len > ALL_SIZE)? ALL_SIZE+1 : len;
+            int len =  seq->seq.l - counts->d[i].last->pos;
+            len = (len > ALL_SIZE)? ALL_SIZE+1 : len;
 
-                counts[idx].all[len]++;
-            }
+            counts->d[i].all[len]++;
         }
 
         /* clear the sites vector  */
@@ -183,25 +149,22 @@ int main(int argc, char **argv) {
     site_list_free(sites);
     sites = NULL;
 
-    // free data structures no longer needed
-    free(matrix);
-
     size_t count_size = 0;
-    for(i = 0; i < triangle_size(enzymes->n); i++){
+    for(i = 0; i < counts->m; i++){
         int rare = 0, freq = 0;
         // Check rare list for the two enzymes
         for(j = 0; j < rare_length; j++){
-            if(strcmp(counts[i].rare->name, names[j]) == 0)
+            if(strcmp(counts->d[i].rare->name, names[j]) == 0)
                 rare |= 1;
-            if(strcmp(counts[i].freq->name, names[j]) == 0)
+            if(strcmp(counts->d[i].freq->name, names[j]) == 0)
                 freq |= 1;
         }
 
         // Check freq list for the two enzymes
         for(j = rare_length; j < rare_length+freq_length; j++){
-            if(strcmp(counts[i].rare->name, names[j]) == 0)
+            if(strcmp(counts->d[i].rare->name, names[j]) == 0)
                 rare |= 2;
-            if(strcmp(counts[i].freq->name, names[j]) == 0)
+            if(strcmp(counts->d[i].freq->name, names[j]) == 0)
                 freq |= 2;
         }
 
@@ -211,22 +174,21 @@ int main(int argc, char **argv) {
 
         /* swap enzymes if rare is in freq list or vise-versa */
         if(rare == 2 || freq == 1){
-            enzyme_t* swp = counts[i].rare;
-            counts[i].rare = counts[i].freq;
-            counts[i].freq = swp;
+            enzyme_t* swp = counts->d[i].rare;
+            counts->d[i].rare = counts->d[i].freq;
+            counts->d[i].freq = swp;
         }
 
         /* move current counts to next available space */
-        counts[count_size] = counts[i];
+        counts->d[count_size] = counts->d[i];
         count_size++;
 
     }
-
+    counts->m = count_size;
 
     print_html(stdout,
                argv[3],
                counts,
-               count_size,
                genome_size,
                mutation_frags);
 
