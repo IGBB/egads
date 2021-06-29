@@ -38,6 +38,15 @@ var table_update = function () {
                               .slice(ridge_plot.extent[0],
                                      ridge_plot.extent[1] + 1))/ row.genome_size
 
+      if(read_depth < 0){
+        read_depth = "-";
+        samp_per_lane = "-";
+        reduction = "-"
+      }
+
+
+
+
         var compat = ""
         if(row.compat == 0) compat = " &#9940;"
         if(row.compat == 1) compat = " &#9989;"
@@ -57,7 +66,7 @@ var table_update = function () {
     })
 
 
-    row_data.sort((a,b) => b[2] - a[2]);
+    row_data.sort((a,b) => b[3] - a[3]);
 
 
     // create a row for each object in the data
