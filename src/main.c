@@ -89,21 +89,35 @@ int main(int argc, char **argv) {
             for(j = 0; j < enzymes->n; j++){
                 count_t * c = counts_get(counts, cur->enz, j);
 
-                /* get length of current fragment, adjust if longer than 10kb */
-                int len = cur->pos - c->last->pos;
-                if (len > ALL_SIZE) len = ALL_SIZE+1;
+                /* Skip all checks for first site on contig */
+                if(c->last != NULL){
 
-                c->all[len]++;
+                    /* Print bed formatted hit to stderr
+                     *TODO: make a cmd flag to toggle this */
+                    if(c->last->enz != cur->enz)
+                        fprintf(stderr, "%s\t%u\t%u\t%s-%s\t%u\n",
+                                seq->name.s,  c->last->pos, cur->pos+1,
+                                c->rare->name, c->freq->name,
+                                cur->pos - c->last->pos);
 
-                /* adjust length again if longer than 1kb */
-                if (len > GOOD_SIZE) len = GOOD_SIZE+1;
 
-                /* store fragment if between different enzymes, or if current
-                 * pair is single enzyme digestion */
-                if((c->last->enz != -1        &&
-                    c->last->enz != cur->enz) ||
-                    (ssize_t)j == cur->enz)
-                    c->good[len]++;
+                    /* get length of current fragment, adjust if longer than 10kb */
+                    int len = cur->pos - c->last->pos;
+                    if (len > ALL_SIZE) len = ALL_SIZE+1;
+
+                    c->all[len]++;
+
+                    /* adjust length again if longer than 1kb */
+                    if (len > GOOD_SIZE) len = GOOD_SIZE+1;
+
+                    /* store fragment if between different enzymes, or if current
+                     * pair is single enzyme digestion */
+                    if(c->last->enz != cur->enz ||
+                       (ssize_t)j == cur->enz)
+                        c->good[len]++;
+                }
+
+
 
                 /* replace previous site */
                 c->last=cur;
@@ -112,6 +126,10 @@ int main(int argc, char **argv) {
 
         /* final fragments */
         for(i = 0; i < counts->m; i++){
+
+            /* Skip section if neither enzyme was found on current contig */
+            if(counts->d[i].last == NULL) continue;
+
             /* get length of last fragment, adjust if longer than 10kb */
             int len =  seq->seq.l - counts->d[i].last->pos;
             len = (len > ALL_SIZE)? ALL_SIZE+1 : len;

@@ -28,7 +28,7 @@ counts_t* counts_init(enzyme_list_t* enzymes){
     /* alloc mem for data struct */
     counts_t* counts = malloc(sizeof(counts_t));
     counts->n = enzymes->n;
-    counts->m = triangle_size(counts->n);
+    counts->m = triangle_size(enzymes->n);
     counts->d = trimalloc(enzymes->n, count_t);
 
     for(i = 0; i < counts->n; i++){
@@ -46,14 +46,15 @@ counts_t* counts_init(enzyme_list_t* enzymes){
         }
     }
 
+
+
     return counts;
 }
 
 counts_t* counts_site_reset(counts_t* counts){
     size_t i;
-    site_t tmp = {.enz=-1, .pos=0};
     for(i = 0; i < counts->m; i++)
-        counts->d[i].last = &tmp;
+        counts->d[i].last = NULL;
 
     return counts;
 }
