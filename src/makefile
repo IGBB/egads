@@ -41,6 +41,6 @@ main.o : restrict.o enzyme.o sequence.o html.o
 
 
 $(PROG): main.o restrict.o enzyme.o sequence.o counts.o html.o d3.bin.o css.bin.o \
-			html.bin.o gel.bin.o ridge.bin.o table.bin.o msbuffmin.bin.o
+			html.bin.o gel.bin.o ridge.bin.o table.bin.o msbuffmin.bin.o args.o
 	$(CC) -o $@ $(CFLAGS) -lz $^
 # end

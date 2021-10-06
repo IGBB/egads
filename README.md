@@ -11,12 +11,14 @@ make -C egads/src
 
 ## Running
 
-`egads` takes three positional arguments: 1) a comma-delimited list of rare
-cutting restriction enzymes, 2) a comma-delimited list of frequent cutting
-restriction enzymes, and 3) a fasta file, optionally compressed with gzip. It
-outputs an html report (see example.html) to `stdout`.
+`egads` requires three arguments: 1) `--rare`: a comma-delimited list of rare
+cutting restriction enzymes, 2) `--freq`: a comma-delimited list of frequent
+cutting restriction enzymes, and 3) `--genome`: a fasta file, optionally
+compressed with gzip. The default output is an html report (see example.html) to
+`stdout`. The arguments `--html`, html report, and `--bed`, fragments in bed
+format, can be used to direct the output elsewhere.
 
 ``` sh
-./egads <rare[,...]> <freq[,...]> <fasta[.gz]> > <output>
+./egads --rare <rare[,...]> --freq <freq[,...]> --genome <fasta[.gz]> > <output>
 ```
 

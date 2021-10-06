@@ -8,7 +8,7 @@
 #include "restrict.h"
 #include "klib/kseq.h"
 #include "counts.h"
-
+#include "args.h"
 
 
 KSEQ_INIT(gzFile, gzread);
@@ -17,18 +17,6 @@ KSEQ_INIT(gzFile, gzread);
 extern void print_html (FILE*, char*, counts_t*, long, int);
 
 
-int parse_enzymes(char * string, char * list []){
-    int len = 0;
-
-    list[len] = strtok(string, ",");
-    while(list[len] != NULL){
-        len++;
-        list[len] = strtok(NULL, ",");
-    }
-
-    return len;
-}
-
 int main(int argc, char **argv) {
     size_t i,j;
     char * enzyme_file = NULL;
@@ -36,23 +24,21 @@ int main(int argc, char **argv) {
     kseq_t *seq;
     int l;
 
-    if (argc != 4) {
-        fprintf(stderr, "Usage: %s <rare[,...]> <freq[,...]> <in.fasta>\n", argv[0]);
-        return 1;
+    arguments_t arguments = parse_options(argc, argv);
+
+    struct {size_t n; char * d[128]; } names = {.n=0};
+    for(i = 0; i < arguments.rare.n; i++){
+        names.d[names.n] = arguments.rare.d[i];
+        names.n++;
     }
-
-
-    char *names[128];
-    /* load rare cutters into name list */
-    size_t rare_length = parse_enzymes(argv[1], names);
-    /* load freq cutters into name list */
-    size_t freq_length = parse_enzymes(argv[2], &(names[rare_length]));
+    for(i = 0; i < arguments.freq.n; i++){
+        names.d[names.n] = arguments.freq.d[i];
+        names.n++;
+    }
 
     /* get enzyme definitions from file */
     enzyme_list_t * enzymes = load_enzymes(enzyme_file,
-                                          names,
-                                          rare_length + freq_length);
-
+                                          names.d, names.n);
 
     counts_t * counts = counts_init(enzymes);
     site_list_t * sites = site_list_init();
@@ -60,7 +46,7 @@ int main(int argc, char **argv) {
     long genome_size = 0;
     int mutation_frags = 0;
 
-    fp = gzopen(argv[3], "r");
+    fp = gzopen(arguments.genome, "r");
     seq = kseq_init(fp);
     while ((l = kseq_read(seq)) >= 0) {
 
@@ -94,8 +80,8 @@ int main(int argc, char **argv) {
 
                     /* Print bed formatted hit to stderr
                      *TODO: make a cmd flag to toggle this */
-                    if(c->last->enz != cur->enz)
-                        fprintf(stderr, "%s\t%u\t%u\t%s-%s\t%u\n",
+                    if(arguments.bed != NULL && c->last->enz != cur->enz)
+                        fprintf(arguments.bed, "%s\t%u\t%u\t%s-%s\t%u\n",
                                 seq->name.s,  c->last->pos, cur->pos+1,
                                 c->rare->name, c->freq->name,
                                 cur->pos - c->last->pos);
@@ -152,18 +138,18 @@ int main(int argc, char **argv) {
     for(i = 0; i < counts->m; i++){
         int rare = 0, freq = 0;
         // Check rare list for the two enzymes
-        for(j = 0; j < rare_length; j++){
-            if(strcmp(counts->d[i].rare->name, names[j]) == 0)
+        for(j = 0; j < arguments.rare.n; j++){
+            if(strcmp(counts->d[i].rare->name, arguments.rare.d[j]) == 0)
                 rare |= 1;
-            if(strcmp(counts->d[i].freq->name, names[j]) == 0)
+            if(strcmp(counts->d[i].freq->name, arguments.rare.d[j]) == 0)
                 freq |= 1;
         }
 
         // Check freq list for the two enzymes
-        for(j = rare_length; j < rare_length+freq_length; j++){
-            if(strcmp(counts->d[i].rare->name, names[j]) == 0)
+        for(j = 0; j < arguments.freq.n; j++){
+            if(strcmp(counts->d[i].rare->name, arguments.freq.d[j]) == 0)
                 rare |= 2;
-            if(strcmp(counts->d[i].freq->name, names[j]) == 0)
+            if(strcmp(counts->d[i].freq->name, arguments.freq.d[j]) == 0)
                 freq |= 2;
         }
 
@@ -185,11 +171,12 @@ int main(int argc, char **argv) {
     }
     counts->m = count_size;
 
-    print_html(stdout,
-               argv[3],
-               counts,
-               genome_size,
-               mutation_frags);
+    if(arguments.html != NULL)
+        print_html(arguments.html,
+                   argv[3],
+                   counts,
+                   genome_size,
+                   mutation_frags);
 
 
     return 0;
