@@ -23,6 +23,7 @@ static ko_longopt_t longopts[] = {
     { "freq",  ko_required_argument, 'f' },
 
     { "genome", ko_required_argument, 'g' },
+    { "title", ko_required_argument, 't' },
 
     { "html", ko_required_argument, 'h' },
     { "bed", ko_required_argument, 'b' },
@@ -38,8 +39,9 @@ arguments_t parse_options(int argc, char **argv) {
 
                                 .genome = NULL,
 
-                                .html = NULL,
-                                .bed  = NULL
+                                .html  = NULL,
+                                .title = NULL,
+                                .bed   = NULL
   };
 
 
@@ -47,9 +49,10 @@ arguments_t parse_options(int argc, char **argv) {
 
   int  c;
   FILE* tmp;
-  while ((c = ketopt(&opt, argc, argv, 1, "r:f:g:h:b", longopts)) >= 0) {
+  while ((c = ketopt(&opt, argc, argv, 1, "r:f:g:h:b:t", longopts)) >= 0) {
     switch(c){
       case 'g': arguments.genome  = opt.arg; break;
+      case 't': arguments.title  = opt.arg; break;
 
       case 'r': arguments.rare.n=parse_enzymes(opt.arg, arguments.rare.d); break;
       case 'f': arguments.freq.n=parse_enzymes(opt.arg, arguments.freq.d); break;
@@ -71,6 +74,10 @@ arguments_t parse_options(int argc, char **argv) {
 
     };
   }
+
+  /* If no title is given, use genome filename */
+  if(arguments.title == NULL)
+    arguments.title = arguments.genome;
 
   /* If no output arguments are given, then default to svg on stdout */
   if(arguments.html == NULL && arguments.bed == NULL)

@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
 
     if(arguments.html != NULL)
         print_html(arguments.html,
-                   argv[3],
+                   arguments.title,
                    counts,
                    genome_size,
                    mutation_frags);

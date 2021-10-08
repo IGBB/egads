@@ -7,7 +7,7 @@ extern const char* const program_version;
 typedef struct {
     struct { size_t n; char * d[64]; }
         rare, freq;
-    char * genome;
+    char * genome, * title;
     FILE * html, * bed;
 } arguments_t;
 
