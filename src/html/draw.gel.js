@@ -46,6 +46,7 @@ function setup_gel_plot(data, container) {
               .call(d3.axisTop(gel_plot.scale.x))
       .selectAll("text")	
         .style("text-anchor", "start")
+        .style("font-style", "italic")
         .attr("dx", ".8em")
         .attr("dy", ".15em")
         .attr("transform", "rotate(-65)");

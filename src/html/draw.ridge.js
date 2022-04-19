@@ -77,6 +77,7 @@ function setup_ridge_plot(data, container) {
            .text(d => d.name)
            .attr('y', ridge_plot.scale.band.bandwidth)
            .attr('x', -ridge_plot.margin.left/2)
+           .attr('style', 'font-style:italic')
 
 
     // setup update function
