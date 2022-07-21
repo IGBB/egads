@@ -4,6 +4,19 @@ var gel_plot = {
     margin:{top: 100, right: 10, bottom: 10, left: 30}
 }
 
+function correct_enzyme_name (d) {
+  var el = d3.select(this);
+  var words=d3.select(this).text().split(/(\b[A-Z][a-z]*)/);
+
+  el.text('');
+
+  for (var i = 1; i < words.length; i++) {
+    var tspan = el.append('tspan').text(words[i]);
+    if((i%2) == 1)
+      tspan.attr("style", "font-style:italic");
+  }
+ }
+
 function setup_gel_plot(data, container) {
 
     // Setup width and height
@@ -46,11 +59,10 @@ function setup_gel_plot(data, container) {
               .call(d3.axisTop(gel_plot.scale.x))
       .selectAll("text")	
         .style("text-anchor", "start")
-        .style("font-style", "italic")
         .attr("dx", ".8em")
         .attr("dy", ".15em")
-        .attr("transform", "rotate(-65)");
-
+        .attr("transform", "rotate(-65)")
+        .each(correct_enzyme_name)
     // add lane plot groups
     gel_plot.lanes = gel_plot.svg
                              .selectAll(".lanes")

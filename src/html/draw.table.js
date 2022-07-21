@@ -53,7 +53,7 @@ var table_update = function () {
         if(row.compat == 2) compat = " &#10067;"
 
         return [compat, // enzyme compatability
-                row.name, // enzyme pair
+                row.name.replace(/\b[A-Z][a-z]*/g, "<i>$&</i>"), // enzyme pair
                 d3.sum(row.good), // total number of good fragments
                 total_selected, // total number of good fragments inside selected size
                 methyl_frag, // methylation reduction

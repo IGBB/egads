@@ -4,6 +4,20 @@ var ridge_plot = {
     margin:{top: 10, right: 10, bottom: 30, left: 80}
 }
 
+function correct_enzyme_name (d) {
+  var el = d3.select(this);
+  var words=d3.select(this).text().split(/(\b[A-Z][a-z]*)/);
+
+  el.text('');
+
+  for (var i = 1; i < words.length; i++) {
+    var tspan = el.append('tspan').text(words[i]);
+    if((i%2) == 1)
+      tspan.attr("style", "font-style:italic");
+  }
+ }
+
+
 function setup_ridge_plot(data, container) {
 
     // Setup width and height
@@ -77,7 +91,7 @@ function setup_ridge_plot(data, container) {
            .text(d => d.name)
            .attr('y', ridge_plot.scale.band.bandwidth)
            .attr('x', -ridge_plot.margin.left/2)
-           .attr('style', 'font-style:italic')
+           .each(correct_enzyme_name)
 
 
     // setup update function

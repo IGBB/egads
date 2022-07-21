@@ -89,10 +89,6 @@ td:first-child{
     text-align: start;
 }
 
-#table table tbody tr td:nth-child(2) {
-  font-style: italic;
-}
-
 #controls{
     display: flex;
     justify-content: space-around;
