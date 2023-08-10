@@ -22,8 +22,9 @@ msbuffmin.txt:
 	wget -O $@ ftp://ftp.neb.com/pub/rebase/msbuffmin.txt
 
 
-enzyme.o : sequence.o
+enzyme.o : sequence.o msbuffmin.txt
 restrict.o : enzyme.o sequence.o
+html.o : html/d3.v5.min.js
 main.o : restrict.o enzyme.o sequence.o html.o
 
 

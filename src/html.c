@@ -5,6 +5,7 @@
 
 #define INCBIN_PREFIX incbin_
 #define INCBIN_STYLE INCBIN_STYLE_SNAKE
+#define INCBIN_SILENCE_BITCODE_WARNING
 #include "incbin/incbin.h"
 
 
