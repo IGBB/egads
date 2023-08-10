@@ -17,6 +17,7 @@ typedef struct {
 site_list_t* site_list_init();
 void site_list_clear(site_list_t*);
 void site_list_free(site_list_t*);
+void restrict_kmer(enzyme_list_t* enzymes, uint64_t kmer, int pos, site_list_t* list);
 
 /* scans the sequence for interactions with the given enzymes. Returns a sorted
  * vector of restriction sites */
