@@ -4,15 +4,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-/* Saved data from msbuffmin.txt at compile time */
-extern const char _binary_msbuffmin_txt_start[];
-extern const char _binary_msbuffmin_txt_end[];
-#define _binary_msbuffmin_txt_size                              \
-    (_binary_msbuffmin_txt_end - _binary_msbuffmin_txt_start)
-
-
-
-
 typedef struct {
     char name [32],        /* Name of Enzyme */
         *buffer_list[20],  /* Sorted list of buffer names */

@@ -4,6 +4,12 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define INCBIN_PREFIX incbin_
+#define INCBIN_STYLE INCBIN_STYLE_SNAKE
+#include "incbin/incbin.h"
+
+INCTXT(msbuffmin, "msbuffmin.txt");
+
 enzyme_list_t* enzyme_list_init(){
     enzyme_list_t * r = malloc(sizeof(enzyme_list_t));
     r->m = 0;
@@ -76,9 +82,7 @@ enzyme_list_t* load_enzymes(char* input, char** names, int len){
             exit(1);
         }
     }else{
-        file = fmemopen((void *)_binary_msbuffmin_txt_start,
-                        _binary_msbuffmin_txt_size,
-                        "r");
+        file = fmemopen((void *) incbin_msbuffmin_data, incbin_msbuffmin_size, "r");
     }
 
     /* pattern string to be encoded. NOTE: Must be equal to the number of bases

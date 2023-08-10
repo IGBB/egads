@@ -3,43 +3,28 @@
 #include "enzyme.h"
 #include "counts.h"
 
+#define INCBIN_PREFIX incbin_
+#define INCBIN_STYLE INCBIN_STYLE_SNAKE
+#include "incbin/incbin.h"
+
+
 /* html/d3.v5.min.js */
-extern const char _binary_html_d3_v5_min_js_start[];
-extern const char _binary_html_d3_v5_min_js_end[];
-#define _binary_html_d3_v5_min_js_size                              \
-    (_binary_html_d3_v5_min_js_end - _binary_html_d3_v5_min_js_start)
+INCBIN(d3, "html/d3.v5.min.js");
 
 /* html/draw.d3.css */
-extern const char _binary_html_draw_d3_css_start[];
-extern const char _binary_html_draw_d3_css_end[];
-#define _binary_html_draw_d3_css_size                              \
-    (_binary_html_draw_d3_css_end - _binary_html_draw_d3_css_start)
+INCBIN(css, "html/draw.d3.css");
 
 /* html/draw.table.js */
-extern const char _binary_html_draw_table_js_start[];
-extern const char _binary_html_draw_table_js_end[];
-#define _binary_html_draw_table_js_size                              \
-    (_binary_html_draw_table_js_end - _binary_html_draw_table_js_start)
+INCBIN(table, "html/draw.table.js");
 
 /* html/draw.ridge.js */
-extern const char _binary_html_draw_ridge_js_start[];
-extern const char _binary_html_draw_ridge_js_end[];
-#define _binary_html_draw_ridge_js_size                              \
-    (_binary_html_draw_ridge_js_end - _binary_html_draw_ridge_js_start)
+INCBIN(ridge, "html/draw.ridge.js");
 
 /* html/draw.gel.js */
-extern const char _binary_html_draw_gel_js_start[];
-extern const char _binary_html_draw_gel_js_end[];
-#define _binary_html_draw_gel_js_size                              \
-    (_binary_html_draw_gel_js_end - _binary_html_draw_gel_js_start)
+INCBIN(gel, "html/draw.gel.js");
 
 /* html/draw.html */
-extern const char _binary_html_draw_html_start[];
-extern const char _binary_html_draw_html_end[];
-#define _binary_html_draw_html_size                              \
-    (_binary_html_draw_html_end - _binary_html_draw_html_start)
-
-
+INCBIN(html, "html/draw.html");
 
 void print_html (FILE* out,
                  char* name,
@@ -63,27 +48,22 @@ void print_html (FILE* out,
 
     /* print html/draw.d3.css */
     fprintf(out, "<style>\n");
-    fwrite(_binary_html_draw_d3_css_start, sizeof(char),
-           _binary_html_draw_d3_css_size, out);
+    fwrite(incbin_css_data, sizeof(char), incbin_css_size, out);
     fprintf(out, "</style>\n");
     /* print html/draw.table.js */
     fprintf(out, "<script type=\"text/javascript\">\n");
-    fwrite(_binary_html_d3_v5_min_js_start, sizeof(char),
-           _binary_html_d3_v5_min_js_size, out);
+    fwrite(incbin_d3_data, sizeof(char), incbin_d3_size, out);
     fprintf(out, "</script>\n");
     fprintf(out, "<script type=\"text/javascript\">\n");
-    fwrite(_binary_html_draw_table_js_start, sizeof(char),
-           _binary_html_draw_table_js_size, out);
+    fwrite(incbin_table_data, sizeof(char), incbin_table_size, out);
     fprintf(out, "</script>\n");
     /* print html/draw.ridge.js */
     fprintf(out, "<script type=\"text/javascript\">\n");
-    fwrite(_binary_html_draw_ridge_js_start, sizeof(char),
-           _binary_html_draw_ridge_js_size, out);
+    fwrite(incbin_ridge_data, sizeof(char), incbin_ridge_size, out);
     fprintf(out, "</script>\n");
     /* print html/draw.gel.js */
     fprintf(out, "<script type=\"text/javascript\">\n");
-    fwrite(_binary_html_draw_gel_js_start, sizeof(char),
-           _binary_html_draw_gel_js_size, out);
+    fwrite(incbin_gel_data, sizeof(char), incbin_gel_size, out);
     fprintf(out, "</script>\n");
 
     /* json output */
@@ -131,12 +111,6 @@ void print_html (FILE* out,
 
     fprintf(out, "\n</script>\n");
     fprintf(out, "</head>\n");
-
-
-    fwrite(_binary_html_draw_html_start, sizeof(char),
-           _binary_html_draw_html_size, out);
-
-
-
+    fwrite(incbin_html_data, sizeof(char), incbin_html_size, out);
     fprintf( out, "</html>" );
 }
