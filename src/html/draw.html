@@ -2,22 +2,22 @@
 
         <div  class="content" id="table">
             <div id="controls">
-                <div class='group'>
-                    <input type="text" id="methyl" value="15"/>
-                    <label for="methyl">% Methylation</label>
-                </div>
-                <div class='group'>
-                    <input type="text" id="missing" value="0"/>
-                    <label for="missing">% Missing</label>
-                </div>
-                <div class='group'>
-                    <input type="text" id="depth" value="10"/>
-                    <label for="depth">Coverage Depth</label>
-                </div>
-                <div class='group'>
-                    <input type="text" id="lane" value="350"/>
-                    <label for="depth">Reads per Lane (M)</label>
-                </div>
+                <label class="matter-textfield-standard">
+                    <input placeholder=" " value="15" id="methyl"/>
+                    <span>% Methylation</span>
+                </label>
+                <label class="matter-textfield-standard">
+                    <input placeholder=" " value="0" id="missing"/>
+                    <span>% Missing</span>
+                </label>
+                <label class="matter-textfield-standard">
+                    <input placeholder=" " value="10" id="depth"/>
+                    <span>Coverage Depth</span>
+                </label>
+                <label class="matter-textfield-standard">
+                    <input placeholder=" " value="350" id="lane"/>
+                    <span>Reads per Lane (M)</span>
+                </label>
             </div>
 
             <table>
@@ -90,6 +90,13 @@
             </table>
         </div>
         <div class="content">
+            <div id="ridge_controls">
+                <label class="matter-switch">
+                    <input type="checkbox" role="switch" id="frag">
+                    <span>All Fragments</span>
+                </label>
+            </div>
+
             <svg width="100%" preserveAspectRatio="xMinYMin" id="ridge"></svg>
             <p class="caption">
                 Length distribution ridge plot of fragments between the enzyme pairs. Size
@@ -113,7 +120,13 @@
      setup_gel_plot(data, d3.select('#gel'));
      setup_table(data, d3.select('#table table'));
 
+
+
      d3.selectAll('#controls input').on('change', table_update);
+     d3.selectAll('#frag').on('change', function() {
+         setup_ridge_plot(data, d3.select('#ridge'),
+                          document.getElementById("frag").checked)
+     });
 
     </script>
 

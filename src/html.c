@@ -12,6 +12,9 @@
 /* html/d3.v5.min.js */
 INCBIN(d3, "html/d3.v5.min.js");
 
+/* html/matter.min.css */
+INCBIN(matter, "html/matter.min.css");
+
 /* html/draw.d3.css */
 INCBIN(css, "html/draw.d3.css");
 
@@ -47,6 +50,10 @@ void print_html (FILE* out,
              "              content=\"width=device-width, initial-scale=1\">\n",
              name);
 
+    /* print html/matter.min.css */
+    fprintf(out, "<style>\n");
+    fwrite(incbin_matter_data, sizeof(char), incbin_matter_size, out);
+    fprintf(out, "</style>\n");
     /* print html/draw.d3.css */
     fprintf(out, "<style>\n");
     fwrite(incbin_css_data, sizeof(char), incbin_css_size, out);
