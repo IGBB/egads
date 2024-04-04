@@ -24,13 +24,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        #platform: [macos-latest, ubuntu-latest, windows-latest]
+        platform: [windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Checkout egads
       uses: actions/checkout@v4
       with:
         submodules: 'recursive'
+    - name: Setup Windows
+      if: startsWith(runner.os, 'Windows')
+      run: echo "::add-path::C:\msys64\usr\bin\"
     - name: Makefile
       run: make -C src
     - name: Release
