@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Checkout egads
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: Makefile
@@ -24,8 +24,6 @@ jobs:
     - name: Release
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      uses: softprops/action-gh-release@v2
-      with:
-          tag_name: "draft"
-          draft: true
-          files: egads
+      run: |
+        mv egads egads_${{ matrix.os }}
+        gh release create -d "draft" egads_${{ matrix.os }}
