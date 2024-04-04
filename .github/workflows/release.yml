@@ -20,7 +20,7 @@ jobs:
       with:
         submodules: 'recursive'
     - name: Makefile
-      run: make -C egads/src
+      run: make -C src
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
