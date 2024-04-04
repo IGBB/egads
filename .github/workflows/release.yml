@@ -25,5 +25,5 @@ jobs:
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        mv egads egads_${{ matrix.os }}
-        gh release create -d "draft" egads_${{ matrix.os }}
+        mv egads egads_${{ runner.os }}
+        gh release create -d "draft" egads_${{ runner.temp }}
