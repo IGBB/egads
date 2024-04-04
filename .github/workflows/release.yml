@@ -8,7 +8,15 @@ on:
   #  branches: [ "main" ]
 
 jobs:
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create
+        run: gh release create -d "draft"
   release:
+    name: Build and Upload
+    needs: create_release
     strategy:
       fail-fast: false
       matrix:
@@ -26,4 +34,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         mv egads egads_${{ runner.os }}
-        gh release create -d "draft" egads_${{ runner.os }}
+        gh release upload "draft" egads_${{ runner.os }}
