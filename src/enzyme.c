@@ -4,6 +4,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef _WIN32
+FILE *fmemopen(void *buf, size_t len, const char *type);
+#include "fmemopen.c"
+#endif
+
 #include "klib/kstring.h"
 
 #define INCBIN_PREFIX incbin_
