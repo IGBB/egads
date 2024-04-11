@@ -38,14 +38,17 @@ jobs:
         "C:\msys64\usr\bin\" | Out-File -FilePath $env:GITHUB_PATH -Append
     - name: Makefile
       run: make -C src
-    - name: Rename (Windows)
-      if: startsWith(runner.os, 'Windows')
-      run: mv egads.exe egads_${{ runner.os }}.exe
-    - name: Rename (Not Windows)
-      if: ${{ ! startsWith(runner.os, 'Windows') }}
-      run: mv egads egads_${{ runner.os }}
-    - name: Release
+    - name: Release (Windows)
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: gh release upload "draft" egads_${{ runner.os }}
-
+      if: startsWith(runner.os, 'Windows')
+      run: |
+        mv egads.exe egads_${{ runner.os }}.exe
+        gh release upload "draft" egads_${{ runner.os }}.exe
+    - name: Release (Not Windows)
+      env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: ${{ ! startsWith(runner.os, 'Windows') }}
+      run: |
+        mv egads egads_${{ runner.os }}
+        gh release upload "draft" egads_${{ runner.os }}
