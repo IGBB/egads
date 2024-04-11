@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "klib/kstring.h"
+
 #define INCBIN_PREFIX incbin_
 #define INCBIN_STYLE INCBIN_STYLE_SNAKE
 #define INCBIN_SILENCE_BITCODE_WARNING
@@ -68,9 +70,7 @@ char* strtok2(char* string, char token){
 
 enzyme_list_t* load_enzymes(char* input, char** names, int len){
     int i;
-    char *s = NULL;
-    size_t slen = 0;
-    ssize_t rlen;
+    kstring_t s = { 0, 0, NULL };
 
     /* Open enzyme file. If file isn't provided, open mem stream to saved
      * restriction enzymes */
@@ -93,13 +93,13 @@ enzyme_list_t* load_enzymes(char* input, char** names, int len){
     enzyme_list_t * list = enzyme_list_init();
 
     /* read each line in enzyme database */
-    while((rlen = getline(&s, &slen, file)) != -1 ){
+    for (s.l = 0; kgetline(&s, (kgets_func *)fgets, file) == 0; s.l = 0){
 
         /* skip lines that begin with space */
-        if(s[0] == ' ') continue;
+        if(ks_str(&s)[0] == ' ') continue;
 
         /* get name (first column) */
-        char * name = strtok2(s, ';');
+        char * name = strtok2(ks_str(&s), ';');
 
         enzyme_t * e;
 
@@ -187,7 +187,7 @@ enzyme_list_t* load_enzymes(char* input, char** names, int len){
 
     }
 
-    free(s);
+    free(s.s);
 
     fclose(file);
 
