@@ -42,5 +42,6 @@ jobs:
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        ls
         mv egads egads_${{ runner.os }}
         gh release upload "draft" egads_${{ runner.os }}
