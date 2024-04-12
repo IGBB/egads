@@ -4,10 +4,16 @@ Electronically Guided Digestion Selection - A ddRAD-seq enzyme selection aid
 
 ## Installation
 
+Install `egads` from this repository with the following command.
+
 ``` sh
 git clone --recursive https://github.com/IGBB/egads
 make -C egads/src
 ```
+
+Binary releases for Windows, macOS, and Linux are available 
+[on the Releases page](https://github.com/igbb/egads/releases) and are released 
+every six months to account for potential updates to the enzyme database.
 
 ## Running
 
