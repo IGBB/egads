@@ -30,6 +30,6 @@ html.o : html/d3.v5.min.js html/draw.d3.css html/draw.gel.js html/draw.html html
 main.o : restrict.o enzyme.o sequence.o html.o
 
 
-$(PROG): main.o restrict.o enzyme.o sequence.o counts.o html.o args.o
+$(PROG): main.o restrict.o enzyme.o sequence.o counts.o html.o args.o klib/kstring.o
 	$(CC) -o $@ $^ $(CFLAGS) -lz
 # end

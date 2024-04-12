@@ -1,11 +1,9 @@
-name: Create Draft Release
+name: Create Release
 
 on:
   workflow_dispatch:
-  #push:
-  #  branches: [ "main" ]
-  #pull_request:
-  #  branches: [ "main" ]
+  schedule:
+    - cron: "0 0 1 */6 *"
 
 jobs:
   create_release:
@@ -17,7 +15,7 @@ jobs:
       - name: Create
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create -d "draft"
+        run: gh release create "v$(date '+%Y.%m')" -t "v$(date '+%Y.%m')"
   release:
     name: Build and Upload
     needs: create_release
@@ -37,9 +35,17 @@ jobs:
         "C:\msys64\usr\bin\" | Out-File -FilePath $env:GITHUB_PATH -Append
     - name: Makefile
       run: make -C src
-    - name: Release
+    - name: Release (Windows)
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: startsWith(runner.os, 'Windows')
+      run: |
+        mv egads.exe egads_${{ runner.os }}.exe
+        gh release upload "v$(date '+%Y.%m')" egads_${{ runner.os }}.exe
+    - name: Release (Not Windows)
+      env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: ${{ ! startsWith(runner.os, 'Windows') }}
       run: |
         mv egads egads_${{ runner.os }}
-        gh release upload "draft" egads_${{ runner.os }}
+        gh release upload "v$(date '+%Y.%m')" egads_${{ runner.os }}
