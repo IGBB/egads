@@ -2,8 +2,8 @@ name: Create Draft Release
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: "0 0 1 */6 *"
+  schedule:
+    - cron: "0 0 1 */6 *"
 
 jobs:
   create_release:
