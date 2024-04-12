@@ -15,7 +15,7 @@ jobs:
       - name: Create
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create -d $(date '+%Y.%m')
+        run: gh release create -d "$(date '+%Y.%m')"
   release:
     name: Build and Upload
     needs: create_release
@@ -41,11 +41,11 @@ jobs:
       if: startsWith(runner.os, 'Windows')
       run: |
         mv egads.exe egads_${{ runner.os }}.exe
-        gh release upload $(date '+%Y.%m') egads_${{ runner.os }}.exe
+        gh release upload "$(date '+%Y.%m')" egads_${{ runner.os }}.exe
     - name: Release (Not Windows)
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       if: ${{ ! startsWith(runner.os, 'Windows') }}
       run: |
         mv egads egads_${{ runner.os }}
-        gh release upload $(date '+%Y.%m') egads_${{ runner.os }}
+        gh release upload "$(date '+%Y.%m')" egads_${{ runner.os }}
