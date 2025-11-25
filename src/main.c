@@ -50,13 +50,6 @@ int main(int argc, char **argv) {
     seq = kseq_init(fp);
     while ((l = kseq_read(seq)) >= 0) {
 
-        /* Calculate the mutation rate for current sequence
-         *        The regression for cellular organisms is
-         *        −0.81 + 0.68log10(G), with r2 = 0.80.
-         *     https://doi.org/10.1016/j.tig.2010.05.003
-         * */
-        mutation_frags += round(-0.81 + 0.68 * log10((double) seq->seq.l));
-
 
         /* Calculate genome size */
         genome_size += seq->seq.l;
@@ -170,6 +163,18 @@ int main(int argc, char **argv) {
 
     }
     counts->m = count_size;
+
+    /* Calculate the mutation rate for current sequence
+     *        The regression for cellular organisms is
+     *        −0.81 + 0.68log10(G), with r2 = 0.80.
+     *     https://doi.org/10.1016/j.tig.2010.05.003
+     * */
+    mutation_frags = round(-0.81 + 0.68 *
+                           log10((double) genome_size ));
+    fprintf(stderr, "genome_size = %ld\nmutation rate = %lf\n",
+            genome_size,
+            -0.81 + 0.68 * log10((double) genome_size/1000000.0 ));
+
 
     if(arguments.html != NULL)
         print_html(arguments.html,
